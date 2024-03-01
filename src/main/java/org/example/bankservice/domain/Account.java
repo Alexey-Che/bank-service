@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Getter
 @Setter
-@Table(name = "bank_accounts")
+@Table(name = "accounts")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Account {
 

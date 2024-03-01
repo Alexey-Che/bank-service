@@ -28,3 +28,12 @@ CREATE TABLE IF NOT EXISTS emails
     email   VARCHAR(255),
     user_id BIGINT REFERENCES users (id)
 );
+
+INSERT INTO users(full_name, birth_date, password, role)
+VALUES ('surname1 name1', '1990-05-15', 'password1', 'ROLE_USER'),
+       ('surname2 name2', '1999-05-15', 'password2', 'ROLE_USER');
+
+INSERT INTO accounts(balance, initial_balance, user_id)
+VALUES (100, 100, 1),
+       (105, 105, 2);
+
