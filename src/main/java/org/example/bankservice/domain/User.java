@@ -6,13 +6,12 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
 
@@ -29,6 +28,9 @@ public class User {
     @Column(name = "password")
     String password;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    Account account;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     List<PhoneNumber> phoneNumbers;
@@ -41,6 +43,24 @@ public class User {
     @Column(name = "role")
     UserRole role;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id)
+                && Objects.equals(fullName, user.fullName)
+                && Objects.equals(birthDate, user.birthDate)
+                && Objects.equals(password, user.password)
+                && Objects.equals(phoneNumbers, user.phoneNumbers)
+                && Objects.equals(emails, user.emails)
+                && role == user.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, fullName, birthDate, password, phoneNumbers, emails, role);
+    }
 }
 
 
