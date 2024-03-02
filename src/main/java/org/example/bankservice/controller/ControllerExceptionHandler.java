@@ -1,6 +1,8 @@
 package org.example.bankservice.controller;
 
 import org.example.bankservice.dto.ValidationErrors;
+import org.example.bankservice.exception.UserEmailNotFoundException;
+import org.example.bankservice.exception.UserPhoneNotFoundException;
 import org.example.bankservice.exception.UserRegistrationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +33,15 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(UserRegistrationException.class)
     public ResponseEntity<?> handleUserRegistrationException(UserRegistrationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ValidationErrors(e.getErrors()));
+    }
+
+    @ExceptionHandler(UserEmailNotFoundException.class)
+    public ResponseEntity<?> handleUserEmailNotFoundException(UserEmailNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email не найден");
+    }
+
+    @ExceptionHandler(UserPhoneNotFoundException.class)
+    public ResponseEntity<?> handleUserPhoneNotFoundException(UserPhoneNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Номер телефона не найден");
     }
 }

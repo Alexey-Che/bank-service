@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.bankservice.dto.AddUserContactDto;
+import org.example.bankservice.dto.DeleteUserContactDto;
 import org.example.bankservice.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class UserController {
 
     @PostMapping("/update-contact/add")
     public ResponseEntity<?> addContacts(@RequestBody @Valid AddUserContactDto addUserContactDto) {
-        userService.addContacts(addUserContactDto);
+        userService.addContacts(addUserContactDto.getEmail(), addUserContactDto.getPhoneNumber());
 
         return ResponseEntity.ok().build();
     }
@@ -30,7 +31,9 @@ public class UserController {
     }
 
     @DeleteMapping("/delete-contact")
-    public ResponseEntity<?> removePhone() {
+    public ResponseEntity<?> removePhone(@RequestBody @Valid DeleteUserContactDto deleteUserContactDto) {
+        userService.deleteContacts(deleteUserContactDto.getEmail(), deleteUserContactDto.getPhoneNumber());
+
         return ResponseEntity.ok().build();
     }
 

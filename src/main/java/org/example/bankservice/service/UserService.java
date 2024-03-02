@@ -9,6 +9,8 @@ import org.example.bankservice.domain.Email;
 import org.example.bankservice.domain.PhoneNumber;
 import org.example.bankservice.domain.User;
 import org.example.bankservice.dto.AddUserContactDto;
+import org.example.bankservice.exception.UserEmailNotFoundException;
+import org.example.bankservice.exception.UserPhoneNotFoundException;
 import org.example.bankservice.exception.UserRegistrationException;
 import org.example.bankservice.repository.EmailRepository;
 import org.example.bankservice.repository.PhoneNumberRepository;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -100,16 +103,32 @@ public class UserService {
     }
 
     @Transactional
-    public void addContacts(AddUserContactDto dto) {
-        User currentUser = getCurrentUser();
+    public void addContacts(String email, String phone) {
+        var currentUser = getCurrentUser();
 
-        if (dto.getEmail() != null && !emailRepository.findAllByUserId(currentUser.getId()).contains(dto.getEmail())) {
-            currentUser.getEmails().add(new Email(dto.getEmail()));
+        if (email != null && !emailRepository.findAllByUserId(currentUser.getId()).contains(email)) {
+            currentUser.getEmails().add(new Email(email));
         }
 
-        if (dto.getPhoneNumber() != null
-                && !phoneNumberRepository.findAllByUserId(currentUser.getId()).contains(dto.getPhoneNumber())) {
-            currentUser.getPhoneNumbers().add(new PhoneNumber(dto.getPhoneNumber()));
+        if (phone != null && !phoneNumberRepository.findAllByUserId(currentUser.getId()).contains(phone)) {
+            currentUser.getPhoneNumbers().add(new PhoneNumber(phone));
+        }
+    }
+
+    @Transactional
+    public void deleteContacts(String email, String phone) {
+        var currentUser = getCurrentUser();
+
+        if (email != null) {
+            var userEmail = emailRepository.findByEmailAndUserId(email, currentUser.getId())
+                    .orElseThrow(UserEmailNotFoundException::new);
+            emailRepository.delete(userEmail);
+        }
+
+        if (phone != null) {
+            var phoneNumber = phoneNumberRepository.findByPhoneAndUserId(phone, currentUser.getId())
+                    .orElseThrow(UserPhoneNotFoundException::new);
+            phoneNumberRepository.delete(phoneNumber);
         }
     }
 
