@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -18,6 +17,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    @Column(name = "username", unique = true, nullable = false)
+    private String username;
 
     @Column(name = "full_name")
     String fullName;
@@ -43,24 +45,6 @@ public class User {
     @Column(name = "role")
     UserRole role;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id)
-                && Objects.equals(fullName, user.fullName)
-                && Objects.equals(birthDate, user.birthDate)
-                && Objects.equals(password, user.password)
-                && Objects.equals(phoneNumbers, user.phoneNumbers)
-                && Objects.equals(emails, user.emails)
-                && role == user.role;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, fullName, birthDate, password, phoneNumbers, emails, role);
-    }
 }
 
 
