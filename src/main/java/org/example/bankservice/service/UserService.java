@@ -1,21 +1,34 @@
 package org.example.bankservice.service;
 
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.example.bankservice.domain.Email;
+import org.example.bankservice.domain.PhoneNumber;
 import org.example.bankservice.domain.User;
+import org.example.bankservice.dto.AddUserContactDto;
+import org.example.bankservice.exception.UserRegistrationException;
+import org.example.bankservice.repository.EmailRepository;
+import org.example.bankservice.repository.PhoneNumberRepository;
 import org.example.bankservice.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
 
-    private final UserRepository repository;
+    UserRepository repository;
+    EmailRepository emailRepository;
+    PhoneNumberRepository phoneNumberRepository;
 
     /**
      * Сохранение пользователя
@@ -33,13 +46,23 @@ public class UserService {
      * @return созданный пользователь
      */
     public User create(User user) {
-//        if (repository.existsByUsername(user.getUsername())) {
-//            throw new RuntimeException("Пользователь с таким именем уже существует");
-//        }
-//
-//        if (repository.existsByEmail(user.getEmails())) {
-//            throw new RuntimeException("Пользователь с таким email уже существует");
-//        }
+        List<String> errors = new ArrayList<>();
+
+        if (repository.existsByUsername(user.getUsername())) {
+            errors.add("Пользователь с таким именем уже существует");
+        }
+
+        if (repository.existsByEmail(getEmails(user))) {
+            errors.add("Пользователь с таким email уже существует");
+        }
+
+        if (repository.existsByPhoneNumbers(getPhoneNumbers(user))) {
+            errors.add("Пользователь с таким номером телефона уже существует");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new UserRegistrationException(errors);
+        }
 
         return save(user);
     }
@@ -72,8 +95,33 @@ public class UserService {
      * @return текущий пользователь
      */
     public User getCurrentUser() {
-        // Получение имени пользователя из контекста Spring Security
         var username = SecurityContextHolder.getContext().getAuthentication().getName();
         return getByUsername(username);
+    }
+
+    @Transactional
+    public void addContacts(AddUserContactDto dto) {
+        User currentUser = getCurrentUser();
+
+        if (dto.getEmail() != null && !emailRepository.findAllByUserId(currentUser.getId()).contains(dto.getEmail())) {
+            currentUser.getEmails().add(new Email(dto.getEmail()));
+        }
+
+        if (dto.getPhoneNumber() != null
+                && !phoneNumberRepository.findAllByUserId(currentUser.getId()).contains(dto.getPhoneNumber())) {
+            currentUser.getPhoneNumbers().add(new PhoneNumber(dto.getPhoneNumber()));
+        }
+    }
+
+    private List<String> getEmails(User user) {
+        return user.getEmails().stream()
+                .map(Email::getEmail)
+                .toList();
+    }
+
+    private List<String> getPhoneNumbers(User user) {
+        return user.getPhoneNumbers().stream()
+                .map(PhoneNumber::getPhone)
+                .toList();
     }
 }

@@ -44,7 +44,6 @@ public class SecurityConfiguration {
                 }))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v1/auth/**").permitAll()
-                        .requestMatchers("/isAlive").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -1,44 +1,37 @@
 package org.example.bankservice.controller;
 
+import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.example.bankservice.dto.AddUserContactDto;
+import org.example.bankservice.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/user")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
 
-    @PostMapping("/phone/add")
-    public ResponseEntity<?> addPhone() {
+    UserService userService;
+
+    @PostMapping("/update-contact/add")
+    public ResponseEntity<?> addContacts(@RequestBody @Valid AddUserContactDto addUserContactDto) {
+        userService.addContacts(addUserContactDto);
+
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/email/add")
-    public ResponseEntity<?> addEmail() {
+    @PostMapping("/update-contact/change")
+    public ResponseEntity<?> changeContacts() {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/phone/change")
-    public ResponseEntity<?> changePhone() {
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/email/change")
-    public ResponseEntity<?> changeEmail() {
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/phone")
+    @DeleteMapping("/delete-contact")
     public ResponseEntity<?> removePhone() {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/email")
-    public ResponseEntity<?> removeEmail() {
-        return ResponseEntity.ok().build();
-    }
 }
