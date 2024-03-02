@@ -119,13 +119,13 @@ public class UserService {
     public void deleteContacts(String email, String phone) {
         var currentUser = getCurrentUser();
 
-        if (email != null) {
+        if (email != null && emailRepository.findAllByUserId(currentUser.getId()).size() < 2) {
             var userEmail = emailRepository.findByEmailAndUserId(email, currentUser.getId())
                     .orElseThrow(UserEmailNotFoundException::new);
             emailRepository.delete(userEmail);
         }
 
-        if (phone != null) {
+        if (phone != null && phoneNumberRepository.findAllByUserId(currentUser.getId()).size() < 2) {
             var phoneNumber = phoneNumberRepository.findByPhoneAndUserId(phone, currentUser.getId())
                     .orElseThrow(UserPhoneNotFoundException::new);
             phoneNumberRepository.delete(phoneNumber);
