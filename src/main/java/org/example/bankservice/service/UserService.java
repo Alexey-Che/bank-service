@@ -1,66 +1,79 @@
-//package org.example.bankservice.service;
-//
-//import lombok.AccessLevel;
-//import lombok.RequiredArgsConstructor;
-//import lombok.experimental.FieldDefaults;
-//import lombok.val;
-//import org.example.bankservice.domain.User;
-//import org.example.bankservice.exception.UserNotFoundException;
-//import org.example.bankservice.repository.UserRepository;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.context.SecurityContext;
-//import org.springframework.security.core.context.SecurityContextHolder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.util.Optional;
-//
-//@Service
-//@RequiredArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-//public class UserService {
-//
-//    UserRepository userRepository;
-//    PasswordEncoder passwordEncoder;
-//
-//    @Transactional
-//    public void saveUser(User user) {
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        userRepository.save(user);
-//    }
-//
-//    public Optional<User> findByEmail(String email) {
-//        return userRepository.findByEmail(email);
-//    }
-//
-//    public User findByEmailAndPassword(String email, String password) {
-//        val userEntity = findByEmail(email);
-//        if (userEntity.isPresent() && passwordEncoder.matches(password, userEntity.get().getPassword())) {
-//            return userEntity.get();
-//        }
-//        return null;
-//    }
-//
-//    public Long getCurrentUserId() {
-//        SecurityContext ctx = SecurityContextHolder.getContext();
-//        Authentication auth = ctx.getAuthentication();
-//        if (auth != null && auth.isAuthenticated()) {
-//            return userRepository.findUserIdByEmail(auth.getName()).orElseThrow(UserNotFoundException::new);
+package org.example.bankservice.service;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.example.bankservice.domain.User;
+import org.example.bankservice.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class UserService {
+
+    private final UserRepository repository;
+
+    /**
+     * Сохранение пользователя
+     *
+     * @return сохраненный пользователь
+     */
+    public User save(User user) {
+        return repository.save(user);
+    }
+
+
+    /**
+     * Создание пользователя
+     *
+     * @return созданный пользователь
+     */
+    public User create(User user) {
+//        if (repository.existsByUsername(user.getUsername())) {
+//            throw new RuntimeException("Пользователь с таким именем уже существует");
 //        }
 //
-//        throw new UserNotFoundException();
-//    }
-//
-//    public User getCurrentUser() {
-//        SecurityContext ctx = SecurityContextHolder.getContext();
-//        Authentication auth = ctx.getAuthentication();
-//        if (auth != null && auth.isAuthenticated()) {
-//            return userRepository.findByEmail(auth.getName()).orElseThrow(UserNotFoundException::new);
+//        if (repository.existsByEmail(user.getEmails())) {
+//            throw new RuntimeException("Пользователь с таким email уже существует");
 //        }
-//
-//        throw new UserNotFoundException();
-//    }
-//
-//
-//}
+
+        return save(user);
+    }
+
+    /**
+     * Получение пользователя по имени пользователя
+     *
+     * @return пользователь
+     */
+    public User getByUsername(String username) {
+        return repository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+
+    }
+
+    /**
+     * Получение пользователя по имени пользователя
+     * <p>
+     * Нужен для Spring Security
+     *
+     * @return пользователь
+     */
+    public UserDetailsService userDetailsService() {
+        return this::getByUsername;
+    }
+
+    /**
+     * Получение текущего пользователя
+     *
+     * @return текущий пользователь
+     */
+    public User getCurrentUser() {
+        // Получение имени пользователя из контекста Spring Security
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return getByUsername(username);
+    }
+}

@@ -23,12 +23,10 @@ public class Account {
     @Column(name = "initial_balance")
     double initialBalance;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     User user;
 
-    public Account(double balance, User user) {
-        this.user = user;
+    public Account(double balance) {
         this.balance = balance;
         this.initialBalance = balance;
     }
