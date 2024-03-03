@@ -6,20 +6,30 @@ import lombok.val;
 import org.example.bankservice.AbstractIntegrationTest;
 import org.example.bankservice.PostrgesDatabaseTests;
 import org.example.bankservice.dto.AddUserContactDto;
+import org.example.bankservice.dto.ChangeContactDto;
+import org.example.bankservice.repository.EmailRepository;
+import org.example.bankservice.repository.PhoneNumberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class UserControllerTest extends AbstractIntegrationTest implements PostrgesDatabaseTests {
+
+    @Autowired
+    EmailRepository emailRepository;
+    @Autowired
+    PhoneNumberRepository phoneNumberRepository;
 
     @DisplayName("Поиск пользователей по номеру телефона, имени, email, дате рождения")
     @SneakyThrows
@@ -83,7 +93,39 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
     }
 
     @Test
+    @DisplayName("Смена номера телефона и email пользователя")
+    @Transactional
+    @SneakyThrows
     void changeContacts() {
+        val request = ChangeContactDto.builder()
+                .oldPhoneNumber("+79123456789")
+                .newPhoneNumber("+79000111444")
+                .oldEmail("test@test.com")
+                .newEmail("newEmail@test.com")
+                .build();
+
+        val oldEmails = emailRepository.findAllByUserId(1L);
+        assertEquals(oldEmails.size(), 1);
+        assertEquals("test@test.com", oldEmails.get(0).getEmail());
+
+        val oldPhones = phoneNumberRepository.findAllByUserId(1L);
+        assertEquals(oldPhones.size(), 1);
+        assertEquals("+79123456789", oldPhones.get(0).getPhone());
+
+
+        mockMvc.perform(post("/v1/user/update-contact/change")
+                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        val updatedEmails = emailRepository.findAllByUserId(1L);
+        assertEquals(updatedEmails.size(), 1);
+        assertEquals("newEmail@test.com", updatedEmails.get(0).getEmail());
+
+        val updatedPhones = phoneNumberRepository.findAllByUserId(1L);
+        assertEquals(updatedPhones.size(), 1);
+        assertEquals("+79000111444", updatedPhones.get(0).getPhone());
     }
 
     @Test
