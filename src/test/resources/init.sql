@@ -40,5 +40,11 @@ VALUES ('test_user1', 'surname1 name1', '1990-05-15', '$2a$10$Nak/b164Gb.kX8IVrU
        ('test_user2', 'surname2 name2', '1999-05-15', '$2a$10$Nak/b164Gb.kX8IVrUb4keCtEQqZWH5L0Z/2ZyIN2do0trUndMQWq',
         'ROLE_USER', 2);
 
+INSERT INTO emails(email, user_id)
+VALUES ('test@test.com', 1);
+
+INSERT INTO phone_numbers(phone, user_id)
+VALUES ('+79123456789', 1);
+
 
 

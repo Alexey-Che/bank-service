@@ -8,7 +8,7 @@ public class QueryService {
 
     private static final String EMAIL_REGEX = "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,5}\\b";
     private static final String PHONE_NUMBER_REGEX = "\\+\\d{11}";
-    private static final String FULL_NAME_REGEX = "[А-Яа-я\\s]+";
+    private static final String FULL_NAME_REGEX = "[А-Яа-яA-Za-z\\s]+";
     private static final String DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
 
     public QueryType detectQueryType(String query) {

@@ -10,7 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 public class AbstractIntegrationTest {
 
-    public static final String ACCESS_HEADER = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwiaWQiOjQsInN1YiI6InRlc3RfdXNlcm5hbWUiLCJpYXQiOjE3MDk0NjMyNjUsImV4cCI6MTc2MjAyMzI2NX0.hY8qw7paMjznA0_GJ4PnGIpSP1V7LQuzQHmwapVXjLi7cVfzTloFs2sIky3lv06l_ExvrEQn8Ga813R2o0jMwA";
+    public static final String ACCESS_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwiaWQiOjYsInN1YiI6InRlc3RfdXNlcjEiLCJpYXQiOjE3MDk0NjY4MDIsImV4cCI6MTc2MjAyNjgwMn0.XUWcczlZmOcp1qhipIvbip_cbkSXL0qab2KUR_CoPMtZsALX7EIz4JNnKzvcUu518PdnAF-sAGpKR5GL2rxzyw";
+    public static final String ACCESS_HEADER = "Authorization";
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
