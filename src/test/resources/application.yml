@@ -1,0 +1,19 @@
+jwt:
+  secret: y4G2Q0TmqLmto3dBLnPoU3nr8ep61Goo75VuX89EwIit0hH5kZy4G2Q0TmqLmto3dBLnPoU3nr8ep61Goo75VuX89EwIit0hH5kZ
+
+spring:
+  datasource:
+    url: foo
+    username: bar
+    password: baz
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+balance-increase-job: "-"

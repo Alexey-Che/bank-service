@@ -2,9 +2,11 @@ package org.example.bankservice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @Schema(description = "Запрос на регистрацию")
 public class SignUpRequest {
 
