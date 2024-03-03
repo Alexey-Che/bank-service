@@ -3,12 +3,14 @@ package org.example.bankservice.domain;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "accounts")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Account {
@@ -29,8 +31,5 @@ public class Account {
     public Account(double balance) {
         this.balance = balance;
         this.initialBalance = balance;
-    }
-
-    public Account() {
     }
 }

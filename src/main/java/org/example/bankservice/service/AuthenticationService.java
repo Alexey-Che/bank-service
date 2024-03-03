@@ -9,6 +9,7 @@ import org.example.bankservice.domain.*;
 import org.example.bankservice.dto.JwtAuthenticationResponse;
 import org.example.bankservice.dto.SignInRequest;
 import org.example.bankservice.dto.SignUpRequest;
+import org.example.bankservice.util.DateUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,8 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     UserService userService;
     JwtService jwtService;
@@ -37,7 +36,7 @@ public class AuthenticationService {
      */
     @SneakyThrows
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
-        val birthDate = formatter.parse(request.getBirthDate());
+        val birthDate = DateUtil.stringToDate(request.getBirthDate());
 
         val user = User.builder()
                 .username(request.getUsername())

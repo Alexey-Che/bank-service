@@ -24,7 +24,7 @@ public class SignUpRequest {
     String email;
 
     @Schema(description = "номер телефона", example = "+79123456789")
-    @Pattern(regexp = "\\+\\d{11}", message = "Номер телефона нужно указать в формате +7XXXXXXXXXX")
+    @Pattern(regexp = "^\\+\\d{11}$", message = "Номер телефона нужно указать в формате +7XXXXXXXXXX")
     @NotBlank(message = "Номер телефона не может быть пустыми")
     String phone;
 

@@ -8,13 +8,13 @@ import lombok.val;
 import org.example.bankservice.domain.Email;
 import org.example.bankservice.domain.PhoneNumber;
 import org.example.bankservice.domain.User;
-import org.example.bankservice.dto.AddUserContactDto;
-import org.example.bankservice.exception.UserEmailNotFoundException;
-import org.example.bankservice.exception.UserPhoneNotFoundException;
-import org.example.bankservice.exception.UserRegistrationException;
+import org.example.bankservice.exception.*;
 import org.example.bankservice.repository.EmailRepository;
 import org.example.bankservice.repository.PhoneNumberRepository;
 import org.example.bankservice.repository.UserRepository;
+import org.example.bankservice.util.DateUtil;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,16 +22,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
 
-    UserRepository repository;
+    UserRepository userRepository;
     EmailRepository emailRepository;
     PhoneNumberRepository phoneNumberRepository;
+    QueryService queryService;
 
     /**
      * Сохранение пользователя
@@ -39,7 +39,7 @@ public class UserService {
      * @return сохраненный пользователь
      */
     public User save(User user) {
-        return repository.save(user);
+        return userRepository.save(user);
     }
 
 
@@ -51,15 +51,15 @@ public class UserService {
     public User create(User user) {
         List<String> errors = new ArrayList<>();
 
-        if (repository.existsByUsername(user.getUsername())) {
+        if (userRepository.existsByUsername(user.getUsername())) {
             errors.add("Пользователь с таким именем уже существует");
         }
 
-        if (repository.existsByEmail(getEmails(user))) {
+        if (userRepository.existsByEmail(getEmails(user))) {
             errors.add("Пользователь с таким email уже существует");
         }
 
-        if (repository.existsByPhoneNumbers(getPhoneNumbers(user))) {
+        if (userRepository.existsByPhoneNumbers(getPhoneNumbers(user))) {
             errors.add("Пользователь с таким номером телефона уже существует");
         }
 
@@ -76,7 +76,7 @@ public class UserService {
      * @return пользователь
      */
     public User getByUsername(String username) {
-        return repository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
     }
@@ -119,17 +119,50 @@ public class UserService {
     public void deleteContacts(String email, String phone) {
         var currentUser = getCurrentUser();
 
-        if (email != null && emailRepository.findAllByUserId(currentUser.getId()).size() < 2) {
-            var userEmail = emailRepository.findByEmailAndUserId(email, currentUser.getId())
+        val emails = emailRepository.findAllByUserId(currentUser.getId());
+        if (email != null && emails.size() > 1) {
+            val userEmail = emails.stream()
+                    .filter(e -> e.getEmail().equals(email))
+                    .findFirst()
                     .orElseThrow(UserEmailNotFoundException::new);
             emailRepository.delete(userEmail);
         }
 
-        if (phone != null && phoneNumberRepository.findAllByUserId(currentUser.getId()).size() < 2) {
-            var phoneNumber = phoneNumberRepository.findByPhoneAndUserId(phone, currentUser.getId())
+        val phoneNumbers = phoneNumberRepository.findAllByUserId(currentUser.getId());
+        if (phone != null && phoneNumbers.size() > 1) {
+            val phoneNumber = phoneNumbers.stream()
+                    .filter(p -> p.getPhone().equals(phone))
+                    .findFirst()
                     .orElseThrow(UserPhoneNotFoundException::new);
             phoneNumberRepository.delete(phoneNumber);
         }
+    }
+
+    public List<User> searchUser(String query, int page, int limit) {
+        val pageRequest = PageRequest.of(page - 1, limit);
+        return switch (queryService.detectQueryType(query)) {
+            case DATE -> searchUserByDateOfBirth(query, pageRequest);
+            case PHONE_NUMBER -> searchUserPhoneNumber(query, pageRequest);
+            case EMAIL -> searchUserByEmail(query, pageRequest);
+            case FULL_NAME -> searchUserByFullName(query, pageRequest);
+            case UNKNOWN -> throw new UserSearchQueryException();
+        };
+    }
+
+    public List<User> searchUserByDateOfBirth(String query, Pageable page) {
+        return userRepository.findByBirthDate(DateUtil.stringToDate(query), page);
+    }
+
+    public List<User> searchUserByEmail(String query, Pageable page) {
+        return userRepository.findByEmail(query, page);
+    }
+
+    public List<User> searchUserPhoneNumber(String query, Pageable page) {
+        return userRepository.findByPhoneNumber(query, page);
+    }
+
+    public List<User> searchUserByFullName(String query, Pageable page) {
+        return userRepository.findByFullNameStartsWith(query, page);
     }
 
     private List<String> getEmails(User user) {

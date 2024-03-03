@@ -11,8 +11,8 @@ import java.util.Optional;
 
 public interface PhoneNumberRepository extends JpaRepository<PhoneNumber, Long> {
 
-    @Query("select p.phone from PhoneNumber p where p.userId = :userId")
-    List<String> findAllByUserId(@Param("userId") Long userId);
+    @Query("select p from PhoneNumber p where p.userId = :userId")
+    List<PhoneNumber> findAllByUserId(@Param("userId") Long userId);
 
     Optional<PhoneNumber> findByPhoneAndUserId(@Param("phone") String email, @Param("userId") Long userId);
 }
