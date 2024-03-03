@@ -13,5 +13,6 @@ public interface EmailRepository extends JpaRepository<Email, Long> {
     @Query("select e from Email e where e.userId = :userId")
     List<Email> findAllByUserId(@Param("userId") Long userId);
 
+    @Query("select e from Email e where e.email = :email and e.userId = :userId")
     Optional<Email> findByEmailAndUserId(@Param("email") String email, @Param("userId") Long userId);
 }

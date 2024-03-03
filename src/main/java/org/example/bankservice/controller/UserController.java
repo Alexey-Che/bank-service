@@ -8,6 +8,7 @@ import lombok.val;
 import org.example.bankservice.domain.Email;
 import org.example.bankservice.domain.PhoneNumber;
 import org.example.bankservice.dto.AddUserContactDto;
+import org.example.bankservice.dto.ChangeContactDto;
 import org.example.bankservice.dto.DeleteUserContactDto;
 import org.example.bankservice.dto.UserDto;
 import org.example.bankservice.service.UserService;
@@ -46,7 +47,12 @@ public class UserController {
     }
 
     @PostMapping("/update-contact/change")
-    public ResponseEntity<?> changeContacts() {
+    public ResponseEntity<?> changeContacts(@RequestBody @Valid ChangeContactDto dto) {
+        userService.changeContacts(dto.getOldEmail(),
+                dto.getOldPhoneNumber(),
+                dto.getNewEmail(),
+                dto.getNewPhoneNumber());
+
         return ResponseEntity.ok().build();
     }
 

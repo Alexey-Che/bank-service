@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -106,12 +107,39 @@ public class UserService {
     public void addContacts(String email, String phone) {
         var currentUser = getCurrentUser();
 
-        if (email != null && !emailRepository.findAllByUserId(currentUser.getId()).contains(email)) {
+        val emails = emailRepository.findAllByUserId(currentUser.getId()).stream()
+                .map(Email::getEmail)
+                .toList();
+
+        if (email != null && !emails.contains(email)) {
             currentUser.getEmails().add(new Email(email));
         }
 
-        if (phone != null && !phoneNumberRepository.findAllByUserId(currentUser.getId()).contains(phone)) {
+        val phones = phoneNumberRepository.findAllByUserId(currentUser.getId()).stream()
+                .map(PhoneNumber::getPhone)
+                .toList();
+
+        if (phone != null && !phones.contains(phone)) {
             currentUser.getPhoneNumbers().add(new PhoneNumber(phone));
+        }
+    }
+
+    @Transactional
+    public void changeContacts(String oldEmail, String oldPhone, String newEmail, String newPhone) {
+        var currentUser = getCurrentUser();
+
+        if (oldEmail != null && newEmail != null) {
+            var email = emailRepository.findByEmailAndUserId(oldEmail, currentUser.getId())
+                    .orElseThrow(UserEmailNotFoundException::new);
+            email.setEmail(newEmail);
+            emailRepository.save(email);
+        }
+
+        if (oldPhone != null && newPhone != null) {
+            var phone = phoneNumberRepository.findByPhoneAndUserId(oldPhone, currentUser.getId())
+                    .orElseThrow(UserPhoneNotFoundException::new);
+            phone.setPhone(newPhone);
+            phoneNumberRepository.save(phone);
         }
     }
 
