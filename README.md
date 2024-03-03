@@ -1,5 +1,12 @@
 ## Сервис банковских операций - bank-service
 
+- Java 17 
+- Spring Boot 3 
+- PostgreSQL
+- TestContainers
+- REST API
+- Maven
+
 ### Локальный запуск проекта
 
 Запуск осуществляется с помощью [*docker-compose.yml*](docker-compose.yml)
