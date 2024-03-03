@@ -58,7 +58,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
         mockMvc.perform(post("/v1/user/update-contact/add")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
 
@@ -74,7 +74,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
         mockMvc.perform(post("/v1/user/update-contact/add")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -90,7 +90,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
         mockMvc.perform(post("/v1/user/update-contact/add")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -118,7 +118,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
         mockMvc.perform(post("/v1/user/update-contact/change")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         val updatedEmails = emailRepository.findAllByUserId(1L);
@@ -149,7 +149,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
         mockMvc.perform(delete("/v1/user/delete-contact")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER2)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         val updatedEmails = emailRepository.findAllByUserId(2L);

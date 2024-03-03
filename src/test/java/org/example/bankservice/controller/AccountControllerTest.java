@@ -28,7 +28,7 @@ class AccountControllerTest extends AbstractIntegrationTest implements PostrgesD
         mockMvc.perform(post("/v1/account/transfer")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
 
@@ -45,7 +45,7 @@ class AccountControllerTest extends AbstractIntegrationTest implements PostrgesD
         mockMvc.perform(post("/v1/account/transfer")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -62,7 +62,7 @@ class AccountControllerTest extends AbstractIntegrationTest implements PostrgesD
         mockMvc.perform(post("/v1/account/transfer")
                         .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
     }
 }

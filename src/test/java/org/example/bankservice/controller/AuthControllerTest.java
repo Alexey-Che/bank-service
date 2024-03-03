@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class AuthControllerTest extends AbstractIntegrationTest implements PostrgesDatabaseTests {
 
@@ -35,7 +34,7 @@ class AuthControllerTest extends AbstractIntegrationTest implements PostrgesData
 
         mockMvc.perform(post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value(not(emptyString())));
     }
@@ -52,7 +51,7 @@ class AuthControllerTest extends AbstractIntegrationTest implements PostrgesData
 
         mockMvc.perform(post("/v1/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value(not(emptyString())));
     }
@@ -74,7 +73,7 @@ class AuthControllerTest extends AbstractIntegrationTest implements PostrgesData
 
         mockMvc.perform(post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -90,7 +89,7 @@ class AuthControllerTest extends AbstractIntegrationTest implements PostrgesData
 
         mockMvc.perform(post("/v1/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 }
