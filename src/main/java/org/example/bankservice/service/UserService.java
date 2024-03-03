@@ -106,19 +106,26 @@ public class UserService {
     public void addContacts(String email, String phone) {
         var currentUser = getCurrentUser();
 
-        val emails = emailRepository.findAllByUserId(currentUser.getId()).stream()
+        val emails = emailRepository.findAll().stream()
                 .map(Email::getEmail)
                 .toList();
 
-        if (email != null && !emails.contains(email)) {
+        if (email != null) {
+            if (emails.contains(email)) {
+                throw new UserContactAlreadyExistException("email уже существует");
+            }
+
             currentUser.getEmails().add(new Email(email));
         }
 
-        val phones = phoneNumberRepository.findAllByUserId(currentUser.getId()).stream()
+        val phones = phoneNumberRepository.findAll().stream()
                 .map(PhoneNumber::getPhone)
                 .toList();
 
-        if (phone != null && !phones.contains(phone)) {
+        if (phone != null) {
+            if (phones.contains(phone)) {
+                throw new UserContactAlreadyExistException("номер телефона уже существует");
+            }
             currentUser.getPhoneNumbers().add(new PhoneNumber(phone));
         }
     }

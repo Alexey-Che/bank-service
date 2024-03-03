@@ -58,6 +58,11 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getError());
     }
 
+    @ExceptionHandler(UserContactAlreadyExistException.class)
+    public ResponseEntity<?> handleUserContactAlreadyExistException(UserContactAlreadyExistException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
     @ExceptionHandler(UserSearchQueryException.class)
     public ResponseEntity<?> handleUserSearchQueryException(UserSearchQueryException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Некорректный запрос поиска: " + e.getString());
