@@ -1,9 +1,7 @@
 package org.example.bankservice.controller;
 
 import org.example.bankservice.dto.ValidationErrors;
-import org.example.bankservice.exception.UserEmailNotFoundException;
-import org.example.bankservice.exception.UserPhoneNotFoundException;
-import org.example.bankservice.exception.UserRegistrationException;
+import org.example.bankservice.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -35,6 +33,11 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ValidationErrors(e.getErrors()));
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователь не найден");
+    }
+
     @ExceptionHandler(UserEmailNotFoundException.class)
     public ResponseEntity<?> handleUserEmailNotFoundException(UserEmailNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email не найден");
@@ -43,5 +46,15 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(UserPhoneNotFoundException.class)
     public ResponseEntity<?> handleUserPhoneNotFoundException(UserPhoneNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Номер телефона не найден");
+    }
+
+    @ExceptionHandler(TransferMoneyException.class)
+    public ResponseEntity<?> handleTransferMoneyException(TransferMoneyException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getError());
+    }
+
+    @ExceptionHandler(UserSearchQueryException.class)
+    public ResponseEntity<?> handleUserSearchQueryException(UserSearchQueryException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Некорректный запрос поиска: " + e.getString());
     }
 }

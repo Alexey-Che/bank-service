@@ -173,7 +173,7 @@ public class UserService {
             case PHONE_NUMBER -> searchUserPhoneNumber(query, pageRequest);
             case EMAIL -> searchUserByEmail(query, pageRequest);
             case FULL_NAME -> searchUserByFullName(query, pageRequest);
-            case UNKNOWN -> throw new UserSearchQueryException();
+            case UNKNOWN -> throw new UserSearchQueryException(query);
         };
     }
 

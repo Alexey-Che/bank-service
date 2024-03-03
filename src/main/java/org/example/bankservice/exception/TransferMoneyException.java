@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class UserSearchQueryException extends QuietException {
+public class TransferMoneyException extends QuietException {
 
-    String string;
+    String error;
 }

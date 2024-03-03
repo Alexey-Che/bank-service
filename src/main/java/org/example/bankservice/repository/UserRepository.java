@@ -25,6 +25,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByFullNameStartsWith(@Param("fullName") String fullName, Pageable page);
 
+    @Query("select u from User u join fetch u.account where u.id = :userId")
+    Optional<User> findByIdFetchAccount(@Param("userId") Long userId);
+
     Optional<User> findByUsername(@Param("username") String username);
 
     boolean existsByUsername(String username);
