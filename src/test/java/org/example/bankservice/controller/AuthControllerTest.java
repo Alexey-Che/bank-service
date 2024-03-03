@@ -26,7 +26,7 @@ class AuthControllerTest extends AbstractIntegrationTest implements PostrgesData
         SignUpRequest request = SignUpRequest.builder()
                 .username("test_username")
                 .email("test@test.ru")
-                .phone("+79123456789")
+                .phone("+79123450000")
                 .password("test_password")
                 .balance(100.05)
                 .fullName("Иванов Иван Иванович")

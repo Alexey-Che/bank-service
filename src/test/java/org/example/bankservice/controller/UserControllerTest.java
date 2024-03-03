@@ -7,6 +7,7 @@ import org.example.bankservice.AbstractIntegrationTest;
 import org.example.bankservice.PostrgesDatabaseTests;
 import org.example.bankservice.dto.AddUserContactDto;
 import org.example.bankservice.dto.ChangeContactDto;
+import org.example.bankservice.dto.DeleteUserContactDto;
 import org.example.bankservice.repository.EmailRepository;
 import org.example.bankservice.repository.PhoneNumberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,7 +39,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
     @ValueSource(strings = {"+79123456789", "surname", "test@test.com", "1990-05-15"})
     void searchUser(String query) {
         mockMvc.perform(get("/v1/user/search")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .param("query", query))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(greaterThan(0))));
@@ -54,7 +56,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
                 .build();
 
         mockMvc.perform(post("/v1/user/update-contact/add")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -70,7 +72,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
                 .build();
 
         mockMvc.perform(post("/v1/user/update-contact/add")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -86,7 +88,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
                 .build();
 
         mockMvc.perform(post("/v1/user/update-contact/add")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -114,7 +116,7 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
 
 
         mockMvc.perform(post("/v1/user/update-contact/change")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -129,6 +131,31 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
     }
 
     @Test
+    @DisplayName("Удаление номера телефона и email пользователя")
+    @Transactional
+    @SneakyThrows
     void removePhone() {
+        val request = DeleteUserContactDto.builder()
+                .email("test_email1@test.com")
+                .phoneNumber("+79123456001")
+                .build();
+
+        val oldEmails = emailRepository.findAllByUserId(2L);
+        assertEquals(oldEmails.size(), 3);
+
+        val oldPhones = phoneNumberRepository.findAllByUserId(2L);
+        assertEquals(oldPhones.size(), 3);
+
+        mockMvc.perform(delete("/v1/user/delete-contact")
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER2)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        val updatedEmails = emailRepository.findAllByUserId(2L);
+        assertEquals(updatedEmails.size(), 2);
+
+        val updatedPhones = phoneNumberRepository.findAllByUserId(2L);
+        assertEquals(updatedPhones.size(), 2);
     }
 }

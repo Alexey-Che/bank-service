@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.jupiter.api.Assertions.*;
 
 class AccountControllerTest extends AbstractIntegrationTest implements PostrgesDatabaseTests {
 
@@ -27,7 +26,7 @@ class AccountControllerTest extends AbstractIntegrationTest implements PostrgesD
                 .build();
 
         mockMvc.perform(post("/v1/account/transfer")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -44,7 +43,7 @@ class AccountControllerTest extends AbstractIntegrationTest implements PostrgesD
                 .build();
 
         mockMvc.perform(post("/v1/account/transfer")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -61,7 +60,7 @@ class AccountControllerTest extends AbstractIntegrationTest implements PostrgesD
                 .build();
 
         mockMvc.perform(post("/v1/account/transfer")
-                        .header(ACCESS_HEADER, ACCESS_TOKEN)
+                        .header(ACCESS_HEADER, ACCESS_TOKEN_USER1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isNotFound());

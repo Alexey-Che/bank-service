@@ -41,10 +41,16 @@ VALUES ('test_user1', 'surname1 name1', '1990-05-15', '$2a$10$Nak/b164Gb.kX8IVrU
         'ROLE_USER', 2);
 
 INSERT INTO emails(email, user_id)
-VALUES ('test@test.com', 1);
+VALUES ('test@test.com', 1),
+       ('test_email1@test.com', 2),
+       ('test_email2@test.com', 2),
+       ('test_email3@test.com', 2);
 
 INSERT INTO phone_numbers(phone, user_id)
-VALUES ('+79123456789', 1);
+VALUES ('+79123456789', 1),
+       ('+79123456001', 2),
+       ('+79123456002', 2),
+       ('+79123456003', 2);
 
 
 
