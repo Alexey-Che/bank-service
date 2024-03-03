@@ -48,6 +48,11 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Номер телефона не найден");
     }
 
+    @ExceptionHandler(UserAccountNotFoundException.class)
+    public ResponseEntity<?> handleUserAccountNotFoundException(UserAccountNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Банковский аккаунт не найден");
+    }
+
     @ExceptionHandler(TransferMoneyException.class)
     public ResponseEntity<?> handleTransferMoneyException(TransferMoneyException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getError());

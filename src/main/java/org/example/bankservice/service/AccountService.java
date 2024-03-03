@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.example.bankservice.domain.Account;
 import org.example.bankservice.exception.TransferMoneyException;
+import org.example.bankservice.exception.UserAccountNotFoundException;
 import org.example.bankservice.exception.UserEmailNotFoundException;
 import org.example.bankservice.repository.AccountRepository;
 import org.example.bankservice.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.example.bankservice.util.DoubleUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,8 @@ public class AccountService {
     AccountRepository accountRepository;
     UserRepository userRepository;
     UserService userService;
+
+    ReentrantLock lock = new ReentrantLock();
 
     @Transactional
     public void increaseBalanceForAllAccounts() {
@@ -36,21 +40,32 @@ public class AccountService {
         accountRepository.saveAll(accounts);
     }
 
+    /**
+     * Перевод денег между аккаунтом авторизованного пользователя другому
+     * @param amount количество переводимых денег
+     * @param recipientUserId id пользователя кому переводятся деньги
+     */
     @Transactional
-    public synchronized void transferMoney(double amount, long recipientUserId) {
-        val currentUser = userService.getCurrentUser();
+    public void transferMoney(double amount, long recipientUserId) {
+        lock.lock();
+        try {
+            val currentUser = userService.getCurrentUser();
 
-        var account = accountRepository.findByUser(currentUser);
+            var account = accountRepository.findByUser(currentUser).orElseThrow(UserAccountNotFoundException::new);
 
-        if (account.getBalance() < amount) {
-            throw new TransferMoneyException("Недостаточно средств для перевода");
+            if (account.getBalance() < amount) {
+                throw new TransferMoneyException("Недостаточно средств для перевода");
+            }
+
+            var recipientUserAccount = userRepository.findByIdFetchAccount(recipientUserId)
+                    .orElseThrow(UserEmailNotFoundException::new)
+                    .getAccount();
+
+            account.setBalance(DoubleUtil.formatDouble(account.getBalance() - amount));
+            recipientUserAccount.setBalance(DoubleUtil.formatDouble(Double.sum(recipientUserAccount.getBalance(), amount)));
+        } finally {
+            lock.unlock();
         }
-
-        var recipientUserAccount = userRepository.findByIdFetchAccount(recipientUserId)
-                .orElseThrow(UserEmailNotFoundException::new)
-                .getAccount();
-        account.setBalance(DoubleUtil.formatDouble(account.getBalance() - amount));
-        recipientUserAccount.setBalance(DoubleUtil.formatDouble(Double.sum(recipientUserAccount.getBalance(), amount)));
     }
 
 }
