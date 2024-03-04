@@ -29,7 +29,7 @@ public class AccountController {
     @Operation(summary = "Перевод денег с одного счета на другой")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Произведен перевод денежных средств"),
-            @ApiResponse(responseCode = "400", description = "Не достаточно средств для перевода"),
+            @ApiResponse(responseCode = "400", description = "Недостаточно средств для перевода"),
             @ApiResponse(responseCode = "404", description = "Не найден пользователь и/или аккаунт")
     })
     @PostMapping("/transfer")
