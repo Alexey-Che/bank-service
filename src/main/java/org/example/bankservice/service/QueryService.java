@@ -11,6 +11,11 @@ public class QueryService {
     private static final String FULL_NAME_REGEX = "[А-Яа-яA-Za-z\\s]+";
     private static final String DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
 
+    /**
+     * Определяет тип поискового запроса
+     * @param query строка поискового запроса
+     * @return {@link QueryType}
+     */
     public QueryType detectQueryType(String query) {
         if (isDateFormat(query)) {
             return QueryType.DATE;

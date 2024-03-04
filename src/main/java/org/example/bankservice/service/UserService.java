@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.example.bankservice.domain.Email;
 import org.example.bankservice.domain.PhoneNumber;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
@@ -102,6 +104,11 @@ public class UserService {
         return getByUsername(username);
     }
 
+    /**
+     * Добавление контактов пользователю, можно добавлять номер телефона и/или email
+     * @param email email
+     * @param phone номер телефона
+     */
     @Transactional
     public void addContacts(String email, String phone) {
         var currentUser = getCurrentUser();
@@ -112,7 +119,7 @@ public class UserService {
 
         if (email != null) {
             if (emails.contains(email)) {
-                throw new UserContactAlreadyExistException("email уже существует");
+                throw new UserContactAlreadyExistException("email" + email +" уже существует");
             }
 
             currentUser.getEmails().add(new Email(email));
@@ -124,12 +131,20 @@ public class UserService {
 
         if (phone != null) {
             if (phones.contains(phone)) {
-                throw new UserContactAlreadyExistException("номер телефона уже существует");
+                throw new UserContactAlreadyExistException("номер телефона" + phone + " уже существует");
             }
             currentUser.getPhoneNumbers().add(new PhoneNumber(phone));
         }
+        log.info("Добавление контактов: пользователь - {}, email - {}, phone - {}", currentUser.getId(), email, phone);
     }
 
+    /**
+     * Смена контактов пользователя, можно менять номер телефона и/или email
+     * @param oldEmail старый email
+     * @param oldPhone старый номер телефона
+     * @param newEmail новый email
+     * @param newPhone новый email
+     */
     @Transactional
     public void changeContacts(String oldEmail, String oldPhone, String newEmail, String newPhone) {
         var currentUser = getCurrentUser();
@@ -147,8 +162,19 @@ public class UserService {
             phone.setPhone(newPhone);
             phoneNumberRepository.save(phone);
         }
+        log.info("Смена контактов: пользователь - {}, email {} -> {}, phone {} -> {} ",
+                currentUser.getId(),
+                oldEmail,
+                newEmail,
+                oldPhone,
+                newEmail);
     }
 
+    /**
+     * Удаление контактов пользователю, можно удалять номер телефона и/или email
+     * @param email email
+     * @param phone номер телефона
+     */
     @Transactional
     public void deleteContacts(String email, String phone) {
         var currentUser = getCurrentUser();
@@ -170,8 +196,16 @@ public class UserService {
                     .orElseThrow(UserPhoneNotFoundException::new);
             phoneNumberRepository.delete(phoneNumber);
         }
+        log.info("Удаление контактов: пользователь - {}, email - {}, phone - {}", currentUser.getId(), email, phone);
     }
 
+    /**
+     * Поиск пользователей по номеру телефона, дате рождения, email, ФИО
+     * @param query строка поискового запроса
+     * @param page номер страницы
+     * @param limit количество элементов на странице
+     * @return список найденных пользователей
+     */
     public List<User> searchUser(String query, int page, int limit) {
         val pageRequest = PageRequest.of(page - 1, limit);
         return switch (queryService.detectQueryType(query)) {
@@ -179,7 +213,10 @@ public class UserService {
             case PHONE_NUMBER -> searchUserPhoneNumber(query, pageRequest);
             case EMAIL -> searchUserByEmail(query, pageRequest);
             case FULL_NAME -> searchUserByFullName(query, pageRequest);
-            case UNKNOWN -> throw new UserSearchQueryException(query);
+            case UNKNOWN -> {
+                log.warn("Некорректный поисковый запрос: {}", query);
+                throw new UserSearchQueryException(query);
+            }
         };
     }
 

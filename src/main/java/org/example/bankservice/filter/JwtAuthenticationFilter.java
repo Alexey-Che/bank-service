@@ -1,4 +1,4 @@
-package org.example.bankservice.service.jwt;
+package org.example.bankservice.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
