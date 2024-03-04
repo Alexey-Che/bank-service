@@ -23,18 +23,19 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Long id;
 
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false)
     String fullName;
 
     @Temporal(TemporalType.DATE)
     Date birthDate;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     String password;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

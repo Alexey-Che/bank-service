@@ -17,12 +17,13 @@ public class PhoneNumber {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Long id;
 
-    @Column(name = "phone")
+    @Column(name = "phone", nullable = false, unique = true)
     String phone;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     Long userId;
 
     public PhoneNumber(String phone) {

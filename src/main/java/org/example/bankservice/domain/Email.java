@@ -17,12 +17,13 @@ public class Email {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Long id;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     String email;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     Long userId;
 
     public Email(String email) {

@@ -17,12 +17,13 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Long id;
 
-    @Column(name = "balance")
+    @Column(name = "balance", nullable = false)
     double balance;
 
-    @Column(name = "initial_balance")
+    @Column(name = "initial_balance", nullable = false)
     double initialBalance;
 
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
