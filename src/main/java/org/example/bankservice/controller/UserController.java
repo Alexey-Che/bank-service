@@ -1,5 +1,8 @@
 package org.example.bankservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -25,6 +28,17 @@ public class UserController {
 
     UserService userService;
 
+    @Operation(summary = """
+            Поиск пользователей по:
+            - номеру телефона
+            - дате рождения
+            - email
+            - ФИО
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Список найденных пользователей"),
+            @ApiResponse(responseCode = "400", description = "Невалидный поисковый запрос")
+    })
     @GetMapping("/search")
     public ResponseEntity<?> searchUser(
             @RequestParam("query") String query,
@@ -41,6 +55,11 @@ public class UserController {
         return ResponseEntity.ok().body(foundUsers);
     }
 
+    @Operation(summary = "Добавление контактов(номера телефона и/или email)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Новые контакты добавлены"),
+            @ApiResponse(responseCode = "400", description = "Контакты уже существуют")
+    })
     @PostMapping("/update-contact/add")
     public ResponseEntity<?> addContacts(@RequestBody @Valid AddUserContactDto addUserContactDto) {
         userService.addContacts(addUserContactDto.getEmail(), addUserContactDto.getPhoneNumber());
@@ -48,6 +67,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Смена контактов(номера телефона и/или email) пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Новые контакты добавлены"),
+            @ApiResponse(responseCode = "404", description = "Контакты которые нужно заменить не были найдены")
+    })
     @PostMapping("/update-contact/change")
     public ResponseEntity<?> changeContacts(@RequestBody @Valid ChangeContactDto dto) {
         userService.changeContacts(dto.getOldEmail(),
@@ -58,6 +82,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Удаление контактов(номера телефона и/или email)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Контакты успешно удалены"),
+            @ApiResponse(responseCode = "404", description = "Контакты не были найдены")
+    })
     @DeleteMapping("/delete-contact")
     public ResponseEntity<?> removePhone(@RequestBody @Valid DeleteUserContactDto deleteUserContactDto) {
         userService.deleteContacts(deleteUserContactDto.getEmail(), deleteUserContactDto.getPhoneNumber());

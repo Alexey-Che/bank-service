@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS accounts
 CREATE TABLE IF NOT EXISTS users
 (
     id         SERIAL PRIMARY KEY,
-    username   VARCHAR(255) NOT NULL,
+    username   VARCHAR(255) NOT NULL UNIQUE,
     full_name  VARCHAR(255),
     birth_date DATE,
     password   VARCHAR(255)        NOT NULL,
@@ -19,14 +19,14 @@ CREATE TABLE IF NOT EXISTS users
 CREATE TABLE IF NOT EXISTS phone_numbers
 (
     id      SERIAL PRIMARY KEY,
-    phone   VARCHAR(20) NOT NULL,
+    phone   VARCHAR(20) NOT NULL UNIQUE,
     user_id BIGINT REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS emails
 (
     id      SERIAL PRIMARY KEY,
-    email   VARCHAR(255) NOT NULL,
+    email   VARCHAR(255) NOT NULL UNIQUE,
     user_id BIGINT REFERENCES users(id)
 );
 
