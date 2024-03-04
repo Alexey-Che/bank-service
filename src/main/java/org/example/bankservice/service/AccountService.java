@@ -24,6 +24,9 @@ import java.util.concurrent.locks.ReentrantLock;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountService {
 
+    private static final double BALANCE_INCREASE_MULTIPLIER = 1.05;
+    private static final double MAX_BALANCE_MULTIPLIER = 2.07;
+
     AccountRepository accountRepository;
     UserRepository userRepository;
     UserService userService;
@@ -31,14 +34,15 @@ public class AccountService {
     ReentrantLock lock = new ReentrantLock();
 
     /**
-     * Увеличение баланса на всех аккаунтов на 5%, но не более чем на 207% от начальной величины
+     * Увеличение баланса на всех аккаунтов на {@value #BALANCE_INCREASE_MULTIPLIER},
+     * но не более чем на {@value #MAX_BALANCE_MULTIPLIER} от начальной величины
      */
     @Transactional
     public void increaseBalanceForAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
         for (var account : accounts) {
-            double newBalance = account.getBalance() * 1.05;
-            if (newBalance <= account.getInitialBalance() * 2.07) {
+            double newBalance = account.getBalance() * BALANCE_INCREASE_MULTIPLIER;
+            if (newBalance <= account.getInitialBalance() * MAX_BALANCE_MULTIPLIER) {
                 account.setBalance(DoubleUtil.formatDouble(newBalance));
             }
         }
