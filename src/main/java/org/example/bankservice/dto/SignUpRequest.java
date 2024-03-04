@@ -32,6 +32,7 @@ public class SignUpRequest {
 
     @Schema(description = "начальный баланс аккаунта", example = "100.05")
     @NotNull(message = "Нужно указать начальный баланс аккаунта")
+    @Positive(message = "Баланс пользователя должен быть положительным")
     Double balance;
 
     @Schema(description = "ФИО", example = "Иванов Иван Иванович")
