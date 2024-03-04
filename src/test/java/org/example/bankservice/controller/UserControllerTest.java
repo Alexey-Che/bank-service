@@ -3,7 +3,7 @@ package org.example.bankservice.controller;
 import jakarta.transaction.Transactional;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.example.bankservice.AbstractIntegrationTest;
+import org.example.bankservice.BankServiceApplicationTest;
 import org.example.bankservice.PostrgesDatabaseTests;
 import org.example.bankservice.dto.AddUserContactDto;
 import org.example.bankservice.dto.ChangeContactDto;
@@ -13,6 +13,7 @@ import org.example.bankservice.repository.PhoneNumberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class UserControllerTest extends AbstractIntegrationTest implements PostrgesDatabaseTests {
+class UserControllerTest extends BankServiceApplicationTest implements PostrgesDatabaseTests {
 
     @Autowired
     EmailRepository emailRepository;
@@ -45,14 +46,19 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
                 .andExpect(jsonPath("$", hasSize(greaterThan(0))));
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource(value = {
+            "add_email@test.com,",
+            ",+79111222333",
+            "add_email@test.com,+79111222333"
+    })
     @DisplayName("Добавление контактов пользователю")
     @Transactional
     @SneakyThrows
-    void addContacts() {
+    void addContacts(String email, String phone) {
         val request = AddUserContactDto.builder()
-                .email("add_email@test.com")
-                .phoneNumber("+79111222333")
+                .email(email)
+                .phoneNumber(phone)
                 .build();
 
         mockMvc.perform(post("/v1/user/update-contact/add")
@@ -94,16 +100,21 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource(value = {
+            "test@test.com,,newEmail@test.com,",
+            ",+79123456789,,+79000111444",
+            "test@test.com,+79123456789,newEmail@test.com,+79000111444"
+    })
     @DisplayName("Смена номера телефона и email пользователя")
     @Transactional
     @SneakyThrows
-    void changeContacts() {
+    void changeContacts(String oldEmail, String oldPhone, String newEmail, String newPhone) {
         val request = ChangeContactDto.builder()
-                .oldPhoneNumber("+79123456789")
-                .newPhoneNumber("+79000111444")
-                .oldEmail("test@test.com")
-                .newEmail("newEmail@test.com")
+                .oldPhoneNumber(oldPhone)
+                .newPhoneNumber(newPhone)
+                .oldEmail(oldEmail)
+                .newEmail(newEmail)
                 .build();
 
         val oldEmails = emailRepository.findAllByUserId(1L);
@@ -121,23 +132,32 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        val updatedEmails = emailRepository.findAllByUserId(1L);
-        assertEquals(updatedEmails.size(), 1);
-        assertEquals("newEmail@test.com", updatedEmails.get(0).getEmail());
+        if (newEmail != null) {
+            val updatedEmails = emailRepository.findAllByUserId(1L);
+            assertEquals(updatedEmails.size(), 1);
+            assertEquals(newEmail, updatedEmails.get(0).getEmail());
+        }
 
-        val updatedPhones = phoneNumberRepository.findAllByUserId(1L);
-        assertEquals(updatedPhones.size(), 1);
-        assertEquals("+79000111444", updatedPhones.get(0).getPhone());
+        if (newPhone != null) {
+            val updatedPhones = phoneNumberRepository.findAllByUserId(1L);
+            assertEquals(updatedPhones.size(), 1);
+            assertEquals(newPhone, updatedPhones.get(0).getPhone());
+        }
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource(value = {
+            "test_email1@test.com,",
+            ",+79123456001",
+            "test_email1@test.com,+79123456001"
+    })
     @DisplayName("Удаление номера телефона и email пользователя")
     @Transactional
     @SneakyThrows
-    void removePhone() {
+    void removePhone(String email, String phone) {
         val request = DeleteUserContactDto.builder()
-                .email("test_email1@test.com")
-                .phoneNumber("+79123456001")
+                .email(email)
+                .phoneNumber(phone)
                 .build();
 
         val oldEmails = emailRepository.findAllByUserId(2L);
@@ -152,10 +172,15 @@ class UserControllerTest extends AbstractIntegrationTest implements PostrgesData
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        val updatedEmails = emailRepository.findAllByUserId(2L);
-        assertEquals(updatedEmails.size(), 2);
+        if (email != null) {
+            val updatedEmails = emailRepository.findAllByUserId(2L);
+            assertEquals(updatedEmails.size(), 2);
+        }
 
-        val updatedPhones = phoneNumberRepository.findAllByUserId(2L);
-        assertEquals(updatedPhones.size(), 2);
+        if (phone != null) {
+            val updatedPhones = phoneNumberRepository.findAllByUserId(2L);
+            assertEquals(updatedPhones.size(), 2);
+        }
     }
+
 }

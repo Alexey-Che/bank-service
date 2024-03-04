@@ -2,7 +2,7 @@ package org.example.bankservice.controller;
 
 import jakarta.transaction.Transactional;
 import lombok.SneakyThrows;
-import org.example.bankservice.AbstractIntegrationTest;
+import org.example.bankservice.BankServiceApplicationTest;
 import org.example.bankservice.PostrgesDatabaseTests;
 import org.example.bankservice.dto.SignInRequest;
 import org.example.bankservice.dto.SignUpRequest;
@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.Matchers.*;
 
-class AuthControllerTest extends AbstractIntegrationTest implements PostrgesDatabaseTests {
+class AuthControllerTest extends BankServiceApplicationTest implements PostrgesDatabaseTests {
 
     @Test
     @Transactional
