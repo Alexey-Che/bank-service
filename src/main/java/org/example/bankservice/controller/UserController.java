@@ -28,7 +28,7 @@ public class UserController {
 
     UserService userService;
 
-    @Operation(summary = """
+    @Operation(summary = "Поиск пользователей",description = """
             Поиск пользователей по:
             - номеру телефона
             - дате рождения
