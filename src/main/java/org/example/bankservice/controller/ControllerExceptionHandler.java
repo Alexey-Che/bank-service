@@ -17,15 +17,14 @@ import java.util.List;
 public class ControllerExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationErrors handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
         List<String> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.add(fieldName + " " + errorMessage);
         });
-        return new ValidationErrors(errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ValidationErrors(errors));
     }
 
     @ExceptionHandler(UserRegistrationException.class)
