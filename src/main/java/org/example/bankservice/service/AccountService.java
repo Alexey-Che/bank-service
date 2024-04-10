@@ -1,9 +1,11 @@
 package org.example.bankservice.service;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.example.bankservice.domain.Account;
@@ -16,6 +18,7 @@ import org.example.bankservice.util.DoubleUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Service
@@ -30,6 +33,9 @@ public class AccountService {
     AccountRepository accountRepository;
     UserRepository userRepository;
     UserService userService;
+    MeterRegistry meterRegistry;
+    @NonFinal
+    Double optionalDouble;
 
     ReentrantLock lock = new ReentrantLock();
 
@@ -46,6 +52,14 @@ public class AccountService {
                 account.setBalance(DoubleUtil.formatDouble(newBalance));
             }
         }
+        optionalDouble =  accounts.stream()
+                .map(Account::getBalance)
+                .mapToInt(Double::intValue)
+                .average()
+                .orElseGet(() -> OptionalDouble.empty().getAsDouble());
+
+        meterRegistry.gauge("averageBalance", optionalDouble);
+
         accountRepository.saveAll(accounts);
     }
 
